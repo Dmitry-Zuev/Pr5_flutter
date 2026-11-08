@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../models/user_profile_data.dart';
 import '../widgets/text_field.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String initialName;
-  final String initialEmail;
-  final String initialPassword;
+  final UserProfileData profile;
 
-  const ProfilePage({
-    super.key,
-    required this.initialName,
-    required this.initialEmail,
-    required this.initialPassword,
-  });
+  const ProfilePage({super.key, required this.profile});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -20,7 +14,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _formKey = GlobalKey<FormState>();
-
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
@@ -29,12 +22,11 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-
-    _nameController = TextEditingController(text: widget.initialName);
-    _emailController = TextEditingController(text: widget.initialEmail);
-    _passwordController = TextEditingController(text: widget.initialPassword);
+    _nameController = TextEditingController(text: widget.profile.fullName);
+    _emailController = TextEditingController(text: widget.profile.email);
+    _passwordController = TextEditingController(text: widget.profile.password);
     _confirmPasswordController =
-        TextEditingController(text: widget.initialPassword);
+        TextEditingController(text: widget.profile.password);
   }
 
   @override
@@ -47,106 +39,93 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _save() {
-    if (_formKey.currentState?.validate() ?? false) {
-      FocusScope.of(context).unfocus();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    FocusScope.of(context).unfocus();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Данные профиля сохранены'),
-        ),
-      );
-    }
+    widget.profile.fullName = _nameController.text.trim();
+    widget.profile.email = _emailController.text.trim();
+    widget.profile.password = _passwordController.text;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Данные профиля проверены и обновлены')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Профиль'),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                Center(
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      color: Colors.grey.shade200,
-                    ),
-                    child: const Icon(
-                      Icons.person,
-                      size: 72,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 28),
-                CustomTextFormField(
-                  inputType: InputFieldType.fullName,
-                  labelText: 'ФИО',
-                  hintText: 'Иванов Иван Иванович',
-                  prefixIcon: const Icon(Icons.person_outline),
-                  controller: _nameController,
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) =>
-                      FocusScope.of(context).nextFocus(),
-                ),
-                const SizedBox(height: 14),
-                CustomTextFormField(
-                  inputType: InputFieldType.email,
-                  labelText: 'Email',
-                  hintText: 'example@mail.com',
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  controller: _emailController,
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) =>
-                      FocusScope.of(context).nextFocus(),
-                ),
-                const SizedBox(height: 14),
-                CustomTextFormField(
-                  inputType: InputFieldType.password,
-                  labelText: 'Пароль',
-                  hintText: 'Минимум 6 символов',
-                  prefixIcon: const Icon(Icons.security),
-                  controller: _passwordController,
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) =>
-                      FocusScope.of(context).nextFocus(),
-                ),
-                const SizedBox(height: 14),
-                CustomTextFormField(
-                  inputType: InputFieldType.confirmPassword,
-                  labelText: 'Повторите пароль',
-                  hintText: 'Повторите пароль',
-                  prefixIcon: const Icon(Icons.security),
-                  controller: _confirmPasswordController,
-                  passwordController: _passwordController,
-                  textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => _save(),
-                ),
-                const SizedBox(height: 24),
-                Center(
-                  child: SizedBox(
-                    width: 170,
-                    child: ElevatedButton(
-                      onPressed: _save,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: const Text('Сохранить'),
-                    ),
-                  ),
-                ),
-              ],
+    return Center(
+      child: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          Center(
+            child: Container(
+              height: 112,
+              width: 112,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                color: Colors.grey.shade200,
+              ),
+              child: const Icon(Icons.person, size: 72),
             ),
           ),
-        ),
+          const SizedBox(height: 24),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 510),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    CustomTextFormField(
+                      inputType: InputFieldType.fullName,
+                      labelText: 'ФИО',
+                      hintText: 'Введите ФИО',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      controller: _nameController,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextFormField(
+                      inputType: InputFieldType.email,
+                      labelText: 'Email',
+                      hintText: 'example@mail.com',
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      controller: _emailController,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextFormField(
+                      inputType: InputFieldType.password,
+                      labelText: 'Пароль',
+                      hintText: 'Введите пароль',
+                      prefixIcon: const Icon(Icons.security),
+                      controller: _passwordController,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextFormField(
+                      inputType: InputFieldType.confirmPassword,
+                      labelText: 'Повторите пароль',
+                      hintText: 'Повторите пароль',
+                      prefixIcon: const Icon(Icons.security),
+                      controller: _confirmPasswordController,
+                      passwordController: _passwordController,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => _save(),
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton(
+                      onPressed: _save,
+                      child: const Text('Сохранить'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -106,15 +106,15 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         prefixIcon: widget.prefixIcon,
         suffixIcon: isPassword
             ? IconButton(
-                icon: Icon(
-                  _hidePassword ? Icons.visibility : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _hidePassword = !_hidePassword;
-                  });
-                },
-              )
+          icon: Icon(
+            _hidePassword ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: () {
+            setState(() {
+              _hidePassword = !_hidePassword;
+            });
+          },
+        )
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
